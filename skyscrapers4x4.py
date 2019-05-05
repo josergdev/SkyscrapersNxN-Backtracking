@@ -1,43 +1,10 @@
 from itertools import permutations
 
 clues = [
-    [2, 2, 1, 3,  
-     2, 2, 3, 1,  
-     1, 2, 2, 3,  
-     3, 2, 1, 3],
-
-    [1, 2, 2, 3,  
-     3, 2, 1, 3,  
-     2, 2, 1, 3,  
-     2, 2, 3, 1]
-]
-
-ini = [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]
-]
-
-hard_clues = [
-    [0, 0, 0, 0,  
-     0, 2, 3, 0,  
-     0, 0, 0, 0,  
-     2, 0, 0, 0]
-]
-
-hard_ini = [
-    [[0, 1, 0, 0],
-     [0, 0, 0, 0],
-     [1, 0, 0, 0],
-     [0, 0, 0, 0]]
-]
-
-clues_prueba = [
-    0, 1, 2, 3,  
-    4, 5, 6, 7,  
-    8, 9, 10, 11,  
-    12, 13, 14, 15
+    2, 2, 1, 3,  
+    2, 2, 3, 1,  
+    1, 2, 2, 3,  
+    3, 2, 1, 3
 ]
 
 """
@@ -49,6 +16,11 @@ sol = [
 ]
 
 """
+
+def solved(clues, board):
+    aux_board = board.copy()
+    solve(clues, aux_board)
+    return aux_board
 
 def solve(clues, board):
     next = find_empty(board)
@@ -111,7 +83,7 @@ def valid(clues, board, num, pos):
 def get_clue_of_completed_row(row):
     v = 0
     m = 0
-    for i, x in enumerate(row):
+    for x in row:
         if m < x:
             v += 1
         m = max(m, x)
@@ -130,6 +102,9 @@ def get_possible_clues_of_incompleted_row(incompleted_row):
         possible_clues.add(get_clue_of_completed_row(r))
     return list(possible_clues)
 
+def ini_board():
+    return [[0 for i in range(4)] for i in range(4)]
+
 def print_board(clues, board):
     print()
     for i in range(8):
@@ -143,6 +118,5 @@ def print_board(clues, board):
             print("{} | {} {} {} {} | {}".format(clues[::-1][i-2],*board[i-2],clues[i+2]))
 
 
-print_board(hard_clues[0], hard_ini[0])
-solve(hard_clues[0], hard_ini[0])
-print_board(hard_clues[0], hard_ini[0])
+print_board(clues, ini_board())
+print_board(clues, solved(clues, ini_board()))
