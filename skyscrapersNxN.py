@@ -1,35 +1,19 @@
 from itertools import permutations
 
-clues = [
-	2, 2, 1, 3,  
-	2, 2, 3, 1,  
-	1, 2, 2, 3,  
-	3, 2, 1, 3
-]
-
-"""
-sol = [
-	[1, 3, 4, 2],
-	[4, 2, 1, 3],
-	[3, 4, 2, 1],
-	[2, 1, 3, 4]
-]
-
-"""
-
 def solved(clues, board):
 	aux_board = board.copy()
 	solve(clues, aux_board)
 	return aux_board
 
 def solve(clues, board):
+	n = len(board)
 	next = find_empty(board)
 	if not next:
 		return True
 	else:
 		row, col = next
 
-	for i in range(1,5):
+	for i in range(1,n+1):
 		if valid(clues, board, i, (row,col)):
 			board[row][col] = i
 			if solve(clues, board):
@@ -40,15 +24,17 @@ def solve(clues, board):
 	return False
 
 def find_empty(board):
-	for i in range(len(board)):
-		for j in range(len(board)):
+	n = len(board)
+	for i in range(n):
+		for j in range(n):
 			if board[i][j] == 0:
 				return (i,j)
 	return None
 
 def valid(clues, board, num, pos):
-	row = [num if i == pos[1] else board[pos[0]][i] for i in range(4)]
-	col = [num if i == pos[0] else board[i][pos[1]] for i in range(4)]
+	n = len(board)
+	row = [num if i == pos[1] else board[pos[0]][i] for i in range(n)]
+	col = [num if i == pos[0] else board[i][pos[1]] for i in range(n)]
 
 	# Check if num is not repeated in the row
 	if row.count(num) > 1:
@@ -64,12 +50,12 @@ def valid(clues, board, num, pos):
 		return False
 
 	# Check if num satisfy the right clue
-	clue = clues[pos[0]+4]
+	clue = clues[pos[0]+n]
 	if  clue != 0 and clue not in get_possible_clues_of_incompleted_row(row[::-1]):
 		return False
 
 	# Check if num satisfy the bot clue
-	clue = clues[::-1][pos[1]+4]
+	clue = clues[::-1][pos[1]+n]
 	if clue != 0 and clue not in get_possible_clues_of_incompleted_row(col[::-1]):
 		return False
 
@@ -90,8 +76,9 @@ def get_clue_of_completed_row(row):
 	return v
 
 def get_possible_clues_of_incompleted_row(incompleted_row):
+	n = len(incompleted_row)
 	possible_rows = []
-	d = list(set([1,2,3,4]) - set([x for x in incompleted_row if x != 0]))
+	d = list(set([x for x in range(1,n+1)]) - set([x for x in incompleted_row if x != 0]))
 	for perm in permutations(d):
 		row = incompleted_row.copy()
 		for e in perm:
@@ -102,20 +89,18 @@ def get_possible_clues_of_incompleted_row(incompleted_row):
 		possible_clues.add(get_clue_of_completed_row(r))
 	return list(possible_clues)
 
-def ini_board():
-	return [[0 for i in range(4)] for i in range(4)]
+def ini_board(n):
+	return [[0 for i in range(n)] for i in range(n)]
 
 def print_board(clues, board):
+	n = len(board)
 	print()
-	for i in range(8):
+	for i in range(n+4):
 		if i == 0:
-			print("    {} {} {} {}".format(*clues[:4]))
-		elif i == 7:
-			print("    {} {} {} {}".format(*clues[7:12][::-1]))
-		elif i == 1 or i == 6:
-			print("   ---------")
+			print("    {}".format(" ".join(str(x) for x in clues[:n])))
+		elif i == n+3:
+			print("    {}".format(" ".join(str(x) for x in clues[n*2:n*3][::-1])))
+		elif i == 1 or i == n+2:
+			print("   {}".format("".join("-" for x in range(n*2+1))))
 		else:
-			print("{} | {} {} {} {} | {}".format(clues[::-1][i-2],*board[i-2],clues[i+2]))
-
-print_board(clues, ini_board())
-print_board(clues, solved(clues, ini_board()))
+			print("{} | {} | {}".format(clues[::-1][i-2], " ".join(str(x) for x in board[i-2]), clues[i+n-2]))
